@@ -1,0 +1,42 @@
+services:
+  solar-bot:
+    build: ./bot
+    container_name: solar-bot
+    restart: unless-stopped
+    devices:
+      - /dev/hidraw0:/dev/hidraw0
+    ports:
+      - "127.0.0.1:8090:8090"
+    env_file:
+      - ./config/.env
+    depends_on:
+      - influxdb
+
+
+  dashboard:
+    build: ./dashboard
+    container_name: solar-dashboard
+    restart: unless-stopped
+    ports:
+      - "100.96.76.55:8091:80"
+    depends_on:
+      - solar-bot
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: solar-influxdb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USERNAME:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:-change-me}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG:-solar}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET:-telemetry}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:-change-me-token}
+
+volumes:
+  influxdb-data:

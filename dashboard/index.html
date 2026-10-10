@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <div>
+        <h1>☀️ Solar Monitor</h1>
+        <p>SAKO SUNON V · онлайн-мониторинг</p>
+    </div>
+    <div class="status">
+        <span id="status-dot"></span>
+        <span id="system-status">Подключение...</span>
+        <span id="mode-badge" class="badge"></span>
+    </div>
+</header>
+
+<main>
+    <section class="cards">
+        <article class="card pv">
+            <div class="title">☀️ Солнце</div>
+            <div class="value"><span id="pv-power">—</span><small>W</small></div>
+            <div class="details">
+                <span>Напряжение <b id="pv-voltage">—</b> V</span>
+                <span>Ток <b id="pv-current">—</b> A</span>
+            </div>
+        </article>
+
+        <article class="card load">
+            <div class="title">🏠 Нагрузка</div>
+            <div class="value"><span id="load-power">—</span><small>W</small></div>
+            <div class="details">
+                <span>VA <b id="load-va">—</b></span>
+                <span>Нагрузка <b id="load-percent">—</b>%</span>
+            </div>
+        </article>
+
+        <article class="card grid">
+            <div class="title">⚡ Электросеть</div>
+            <div class="value"><span id="grid-power">—</span><small>W</small></div>
+            <div class="details">
+                <span>Напряжение <b id="grid-voltage">—</b> V</span>
+                <span>Частота <b id="grid-frequency">—</b> Hz</span>
+            </div>
+        </article>
+
+        <article class="card battery">
+            <div class="title">🔋 Аккумулятор</div>
+            <div class="value"><span id="battery-voltage">—</span><small>V</small></div>
+            <div class="details">
+                <span>Заряд <b id="battery-soc">—</b> %</span>
+                <span>Ток <b id="battery-current">—</b> A</span>
+            </div>
+        </article>
+
+        <article class="card inverter">
+            <div class="title">🔌 Инвертор</div>
+            <div class="value"><span id="output-voltage">—</span><small>V</small></div>
+            <div class="details">
+                <span>Частота <b id="output-frequency">—</b> Hz</span>
+                <span>Температура <b id="inverter-temp">—</b> °C</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>📈 Текущая мощность</h2>
+                <p>Последние измерения системы</p>
+            </div>
+            <span id="last-update">Нет данных</span>
+        </div>
+
+        <div class="chart">
+            <div class="chart-row">
+                <span>☀️ PV</span>
+                <div class="bar"><i id="pv-bar"></i></div>
+                <b id="pv-chart-value">— W</b>
+            </div>
+            <div class="chart-row">
+                <span>🏠 Нагрузка</span>
+                <div class="bar"><i id="load-bar"></i></div>
+                <b id="load-chart-value">— W</b>
+            </div>
+            <div class="chart-row">
+                <span>⚡ Сеть</span>
+                <div class="bar"><i id="grid-bar"></i></div>
+                <b id="grid-chart-value">— W</b>
+            </div>
+        </div>
+    </section>
+
+    <h3 class="summary-title">Сегодня</h3>
+    <section class="summary">
+        <article class="summary-card">
+            <span>☀️ Генерация сегодня</span>
+            <strong id="today-generation">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>🏠 Потребление сегодня</span>
+            <strong id="today-consumption">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>⚡ Из сети сегодня</span>
+            <strong id="today-grid">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>💰 Экономия</span>
+            <strong id="today-savings">—</strong>
+            <small>руб.</small>
+        </article>
+    </section>
+
+    <h3 class="summary-title">С начала месяца</h3>
+    <section class="summary">
+        <article class="summary-card">
+            <span>☀️ Генерация</span>
+            <strong id="month-generation">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>🏠 Потребление</span>
+            <strong id="month-consumption">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>⚡ Из сети</span>
+            <strong id="month-grid">—</strong>
+            <small>kWh</small>
+        </article>
+        <article class="summary-card">
+            <span>💰 Экономия</span>
+            <strong id="month-savings">—</strong>
+            <small>руб.</small>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>⚠️ События</h2>
+                <p>Режим инвертора, сеть, предупреждения</p>
+            </div>
+        </div>
+        <div id="events-list" class="events">Загрузка...</div>
+    </section>
+</main>
+
+<footer>Solar Monitor · обновление данных каждые 5 секунд</footer>
+<script src="app.js"></script>
+</body>
+</html>
