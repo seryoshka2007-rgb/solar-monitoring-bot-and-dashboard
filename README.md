@@ -101,7 +101,7 @@ Example health check on the server:
 
 ```bash
 curl http://127.0.0.1:8090/api/health
-{ _ble_edit_exec_gexec__save_lastarg "$@"; } 4>&1 5>&2 &>/dev/null
+```
 
 # Русский
 
@@ -163,7 +163,6 @@ Solar Monitor собирает телеметрию инвертора SAKO SUNO
 ## HTTP API
 
 Приложение предоставляет JSON API на порту `8090`
-{ _ble_edit_exec_gexec__save_lastarg "$@"; } 4>&1 5>&2 &>/dev/null
 
 
 API возвращает данные в формате JSON и доступен на порту `8090` внутри контейнера. В конфигурации Docker Compose порт на хосте привязан к localhost.
