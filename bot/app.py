@@ -499,7 +499,7 @@ def allowed(
 ):
 
     if not ALLOWED_CHAT_IDS:
-        return True
+        return False
 
     return (
         str(message.chat.id)
@@ -3183,6 +3183,12 @@ async def main():
         raise RuntimeError(
             "TELEGRAM_BOT_TOKEN "
             "is not configured"
+        )
+
+    if not ALLOWED_CHAT_IDS:
+        raise RuntimeError(
+            "TELEGRAM_CHAT_ID is not configured; "
+            "refusing to start without an access allow-list"
         )
 
     bot = Bot(
