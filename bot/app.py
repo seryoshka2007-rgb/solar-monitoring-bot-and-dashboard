@@ -480,6 +480,7 @@ class VoltronicProvider:
 last_telemetry = None
 
 last_successful_sample = None
+collector_started_at = None
 
 alert_states = {}
 
@@ -1426,7 +1427,8 @@ from(bucket: "{INFLUX_BUCKET}")
       stop: time(v: "{end.isoformat()}")
   )
   |> filter(fn: (r) =>
-      r._measurement == "inverter"
+      r._measurement == "inverter" and
+      r._field =~ /^(pv_power_w|load_power_w|grid_voltage_v|battery_charge_current_a|battery_discharge_current_a|battery_voltage_v)$/
   )
 '''
 
@@ -2853,7 +2855,9 @@ async def collector_loop(
 
     global last_telemetry
     global last_successful_sample
+    global collector_started_at
 
+    collector_started_at = datetime.now(timezone.utc)
     provider = VoltronicProvider()
 
     while True:
@@ -3046,6 +3050,7 @@ async def data_watchdog(
 ):
 
     global last_successful_sample
+    global collector_started_at
 
     while True:
 
@@ -3056,15 +3061,18 @@ async def data_watchdog(
         if not ALERTS_ENABLED:
             continue
 
-        if last_successful_sample is None:
+        reference_time = (
+            last_successful_sample
+            if last_successful_sample is not None
+            else collector_started_at
+        )
+
+        if reference_time is None:
             continue
 
         elapsed = (
-            datetime.now(
-                timezone.utc
-            )
-            -
-            last_successful_sample
+            datetime.now(timezone.utc)
+            - reference_time
         ).total_seconds()
 
         no_data = (

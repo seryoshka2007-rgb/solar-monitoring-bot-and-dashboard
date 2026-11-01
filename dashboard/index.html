@@ -19,7 +19,57 @@
     </div>
 </header>
 
-<main>
+<main class="dashboard-layout">
+    <aside class="weather-panel panel">
+        <div class="panel-head">
+            <div><h2>Погода в Тирасполе</h2><p>Прогноз на 5 дней</p></div>
+            <span id="weather-updated">Загрузка...</span>
+        </div>
+        <div id="weather-current">Загружаем погоду...</div>
+        <div id="weather-details" class="weather-details"></div>
+        <div id="weather-forecast" class="weather-forecast">Загрузка прогноза...</div>
+    </aside>
+    <div class="monitor-column">
+
+    <section class="panel flow-panel">
+        <div class="panel-head">
+            <div><h2>Энергопоток</h2><p>Текущие измерения инвертора</p></div>
+            <span class="flow-live"><i></i> LIVE</span>
+        </div>
+        <div class="energy-flow">
+            <article class="flow-node flow-pv">
+                <span class="flow-icon">☀️</span><span class="flow-name">Солнечные панели</span>
+                <strong><span id="flow-pv-power">—</span><small> W</small></strong>
+                <span class="flow-detail"><span id="flow-pv-voltage">—</span> V</span>
+            </article>
+            <div id="flow-pv-link" class="flow-link pv-link"><span>PV</span><b>→</b></div>
+            <article class="flow-node flow-inverter">
+                <span class="flow-icon">🔌</span><span class="flow-name">Инвертор</span>
+                <strong><span id="flow-inverter-voltage">—</span><small> V</small></strong>
+                <span class="flow-detail"><span id="flow-inverter-temp">—</span> °C</span>
+            </article>
+            <div id="flow-load-link" class="flow-link load-link"><span>Дом</span><b>→</b></div>
+            <article class="flow-node flow-home">
+                <span class="flow-icon">🏠</span><span class="flow-name">Потребление</span>
+                <strong><span id="flow-load-power">—</span><small> W</small></strong>
+                <span class="flow-detail">Загрузка: <span id="flow-load-percent">—</span>%</span>
+            </article>
+            <article class="flow-node flow-grid">
+                <span class="flow-icon">⚡</span><span class="flow-name">Электросеть</span>
+                <strong><span id="flow-grid-power">—</span><small> W</small></strong>
+                <span class="flow-detail"><span id="flow-grid-voltage">—</span> V</span>
+            </article>
+            <div id="flow-grid-link" class="flow-link grid-link"><span>Сеть</span><b>↔</b></div>
+            <div id="flow-battery-link" class="flow-link battery-link"><span id="flow-battery-direction">Нет тока</span><b>↔</b></div>
+            <article class="flow-node flow-battery">
+                <span class="flow-icon">🔋</span><span class="flow-name">Аккумулятор</span>
+                <strong><span id="flow-battery-soc">—</span><small> %</small></strong>
+                <span class="flow-detail"><span id="flow-battery-voltage">—</span> V · <span id="flow-battery-current">—</span> A</span>
+            </article>
+        </div>
+        <p class="flow-note">Стрелки показывают наличие измеряемой мощности или тока. Направление обмена с сетью не определяется только по величине мощности.</p>
+    </section>
+
     <section class="cards">
         <article class="card pv">
             <div class="title">☀️ Солнце</div>
@@ -152,9 +202,11 @@
         </div>
         <div id="events-list" class="events">Загрузка...</div>
     </section>
+    </div>
 </main>
 
-<footer>Solar Monitor · обновление данных каждые 5 секунд</footer>
+<footer>Solar Monitor · текущие показатели обновляются каждые 15 секунд</footer>
 <script src="app.js"></script>
+<script src="weather.js"></script>
 </body>
 </html>

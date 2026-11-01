@@ -12,6 +12,45 @@ function setText(id, value, decimals = 0) {
     el.textContent = Number(value).toFixed(decimals);
 }
 
+
+function updateEnergyFlow(data) {
+    setText("flow-pv-power", data.pv_power_w);
+    setText("flow-pv-voltage", data.pv_voltage_v, 1);
+    setText("flow-inverter-voltage", data.output_voltage_v, 1);
+    setText("flow-inverter-temp", data.inverter_temp_c, 1);
+    setText("flow-load-power", data.load_power_w);
+    setText("flow-load-percent", data.load_percent);
+    setText("flow-grid-power", data.grid_power_w);
+    setText("flow-grid-voltage", data.grid_voltage_v, 1);
+    setText("flow-battery-soc", data.battery_soc_pct);
+    setText("flow-battery-voltage", data.battery_voltage_v, 2);
+
+    const charge = Math.max(0, Number(data.battery_charge_current_a) || 0);
+    const discharge = Math.max(0, Number(data.battery_discharge_current_a) || 0);
+    const current = charge - discharge;
+    document.getElementById("flow-battery-current").textContent =
+        (current > 0 ? "+" : "") + current.toFixed(2);
+
+    const pvActive = Number(data.pv_power_w) > 1;
+    const loadActive = Number(data.load_power_w) > 1;
+    const gridActive = Math.abs(Number(data.grid_power_w) || 0) > 1;
+    const batteryActive = charge > 0.05 || discharge > 0.05;
+
+    const states = [
+        ["flow-pv-link", pvActive, pvActive ? "→" : "·"],
+        ["flow-load-link", loadActive, loadActive ? "→" : "·"],
+        ["flow-grid-link", gridActive, gridActive ? "↔" : "·"],
+        ["flow-battery-link", batteryActive, charge > 0.05 ? "←" : discharge > 0.05 ? "→" : "·"]
+    ];
+    for (const [id, active, arrow] of states) {
+        const el = document.getElementById(id);
+        el.classList.toggle("active", active);
+        el.querySelector("b").textContent = arrow;
+    }
+    document.getElementById("flow-battery-direction").textContent =
+        charge > 0.05 ? "Заряд" : discharge > 0.05 ? "Разряд" : "Нет тока";
+}
+
 function setBar(id, value, max = 5000) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -110,26 +149,40 @@ async function loadStatus() {
         setBar("grid-bar", data.grid_power_w);
 
         setFreshness(data.age_s, data.ts);
+        updateEnergyFlow(data);
     } catch (error) {
         console.error("Dashboard API:", error);
         setOnline(false);
     }
 }
 
-async function loadSummary() {
+async function loadSummary(period) {
     try {
-        for (const [period, prefix] of [["today", "today"], ["month", "month"]]) {
-            const response = await fetch("/api/current/" + period, { cache: "no-store" });
-            if (!response.ok) throw new Error("HTTP " + response.status);
-            const r = (await response.json()).report;
+        const response = await fetch("/api/current/" + period, { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const r = (await response.json()).report;
 
-            setText(prefix + "-generation", r.generation_kwh, 2);
-            setText(prefix + "-consumption", r.consumption_kwh, 2);
-            setText(prefix + "-grid", r.grid_kwh, 2);
-            setText(prefix + "-savings", r.savings_rub, 2);
-        }
+        setText(period + "-generation", r.generation_kwh, 2);
+        setText(period + "-consumption", r.consumption_kwh, 2);
+        setText(period + "-grid", r.grid_kwh, 2);
+        setText(period + "-savings", r.savings_rub, 2);
     } catch (error) {
-        console.error("Summary API:", error);
+        console.error("Summary API (" + period + "):", error);
+    }
+}
+
+let summaryCycleRunning = false;
+
+async function loadSummariesSequentially() {
+    if (summaryCycleRunning) return;
+    summaryCycleRunning = true;
+
+    try {
+        await loadSummary("today");
+        await loadSummary("month");
+    } finally {
+        summaryCycleRunning = false;
+        setTimeout(loadSummariesSequentially, 3600000);
     }
 }
 
@@ -171,8 +224,7 @@ async function loadEvents() {
 }
 
 loadStatus();
-loadSummary();
-setInterval(loadStatus, 5000);
-setInterval(loadSummary, 30000);
+loadSummariesSequentially();
+setInterval(loadStatus, 15000);
 loadEvents();
 setInterval(loadEvents, 15000);
